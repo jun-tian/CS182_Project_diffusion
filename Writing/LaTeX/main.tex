@@ -1,0 +1,80 @@
+\documentclass[a4paper]{article} 
+\input{head}
+\begin{document}
+
+%-------------------------------
+%	TITLE SECTION
+%-------------------------------
+\fancyhead[C]{}
+\hrule \medskip % Upper rule
+\begin{minipage}{0.295\textwidth} 
+\raggedright
+\footnotesize
+Group Name: \hfill \\
+Berkeley Goggles
+\end{minipage}
+\begin{minipage}{0.4\textwidth} 
+\centering 
+\large 
+Project Question Design\\ 
+\normalsize 
+CS182\\ 
+\end{minipage}
+\begin{minipage}{0.295\textwidth} 
+\raggedleft
+\today\hfill\\
+\end{minipage}
+\medskip\hrule 
+\bigskip
+
+%-------------------------------
+%	Problem
+%-------------------------------
+\section{Image Synthesis with Diffusion Model}
+
+Please follow the instructions in this \href{https://colab.research.google.com/drive/1mmyvwlYvAnnfIBIr29bMvOEnL2mUcPHm?usp=sharing}{notebook}. 
+You will implement a text conditioned denoising unet and the sampling algorithm. Then you'll see the diffusion process on a single image and try to train your own diffusion mode. Once you finished with the notebook,
+\begin{itemize}
+    \item download submission.zip and submit it to Gradescope.
+
+    \item Answer the following questions in your submission of the written assignment:
+\end{itemize}
+
+\begin{itemize}
+    \item [(a)]
+    Why might a U-Net by a good choice for the model backbone? List two reasons.
+
+    \textcolor{blue}{Solution:
+    (This is an open question, if the explanation of the answer is reasonable, then it can be considered correct)
+    \begin{itemize}
+        \item The model must output the amount of noise in the input, which is of the same shape as the input, meaning both the input and output are of identical shape. This is exactly what a U-Net does.
+        \item UNet has an inductive bias geared towards image-like data. This is due to using convolutions and the downsampling followed by upsampling with skip connections between them which gives it the ability to pick out hierarchical and spatial structures in data.
+    \end{itemize}
+}
+
+    \item [(b)]
+    Screenshot your visualization for get noisy image and include it in your submission of the written assignment. And describe the picture you observed briefly. What kind of process is this?
+
+    \begin{figure}[htbp]
+        \centering
+        \includegraphics[width=0.6\textwidth]{sample.png}
+        \caption{Visualization for Sampling}
+        \label{fig:sample}
+    \end{figure}
+    \textcolor{blue}{Solution: Shown as Abbildung \ref{fig:sample}. This should be a process of gradually adding noise to the original picture. Corresponding to the q sample in diffusion model algorithm.
+    }
+
+    \item [(c)]
+    Screenshot one of your visualization about the sampled images and include it in your submission of the written assignment. Then answer the following question. How does the model perform and does it meet your expectations? If not, what do you think are the directions for improvement?
+
+    \begin{figure}[htbp]
+        \centering
+        \includegraphics[width=0.3\textwidth]{performance.png}
+        \caption{Visualization for Model Performance}
+        \label{fig:perf}
+    \end{figure}
+
+    \textcolor{blue}{Solution: The performance of the model was not so great and did not meet expectations. As can be seen from the visualization picture, it only learns the style of the dataset, but does not learn the real semantic information. The main reason is that the datasets and models we use are too small. At the same time, MNIST is not a standard image-text pair dataset, so our text definition is not very accurate. In addition, clip does not perform particularly well with handwritten digits. In order to improve the performance of the model, we also need to consider using a larger and more professional image-text pair dataset while increasing the scale of the model. This further underscores the current trend towards larger models.}
+\end{itemize}
+
+\end{document}
