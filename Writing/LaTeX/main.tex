@@ -54,20 +54,20 @@ Auto-encoders downsample the input images by a factor of \(f=2^m, m  \, \epsilon
 \end{itemize}
 
 \subsection{Conditional LDM Loss}
-We can think of diffusion models as a sequence of denoising autoencoders \(\epsilon_{\theta}(x_t, t)\); \(t = 1...T\) where \(x_t\) is a noisy version of the input and  \(t\) is sampled uniformly. We get the following loss:
+For a deeper explanation of the diffusion process, feel free to complete the code in Problem 2 first where an explanation of the diffusion process is provided in the Google Colab. We can think of diffusion models as a sequence of denoising auto-encoders \(\epsilon_{\theta}(x_t, t)\); \(t = 1...T\) where \(x_t\) is a noisy version of the input and  \(t\) is sampled uniformly.  We get the following loss for diffusion models:
 
 \[L_{LDM} = \mathbb{E}_{\varepsilon(x), \varepsilon \sim \mathcal{N}(0, 1), t} [\| \varepsilon - \varepsilon_{\theta}(x_t, t) \|_2^2 ] \]
 
-For a conditional LDM, we use a conditional denoising autoencoder which takes in the latent representation, \(z_t\) and a domain specific encoder \(\tau_{\theta}\) that projects a text input \(y\) into an intermediate representation. 
+For a conditional LDM, we use a conditional denoising auto-encoder which takes in the latent representation, \(z_t\) and a domain specific encoder \(\tau_{\theta}\) that projects a text input \(y\) into an intermediate representation.  
 \begin{itemize}
     \item [(b)]
     Write the loss function for a conditional LDM.
    
 \end{itemize}
- \textcolor{blue}{Solution: Instead of taking in the noisy input \(x_t\), we take in the latent representation and the intermediate representation of a text input \(y\) after being passed through the domain specific encoder, \(\tau_{\theta}\). 
- The output of the conditional denoising autoencoder can be written as, 
+ \textcolor{blue}{Solution: Instead of taking in the noisy input \(x_t\), we take in the latent representation \(z_t\) and the representation of a text input \(y\) after being passed through the domain specific encoder, \(\tau_{\theta}\). The representation of \(y\) is then \(\tau_{\theta}(y))\).
+ The output of the conditional denoising auto-encoder can be written as
  \(\varepsilon_{\theta}(z_t, t, \tau_{\theta}(y))\). Thus the loss can be written as
- \[L_{LDM} = \mathbb{E}_{\varepsilon(x), y, \varepsilon \sim \mathcal{N}(0, 1)} [\| \varepsilon - \varepsilon_{\theta}(z_t, t, \tau_{\theta}(y)) \|_2^2] \] }
+ \[L_{LDM} = \mathbb{E}_{\varepsilon(x), y, \varepsilon \sim \mathcal{N}(0, 1), t} [\| \varepsilon - \varepsilon_{\theta}(z_t, t, \tau_{\theta}(y)) \|_2^2] \] }
 
 
 %-------------------------------
