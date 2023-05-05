@@ -16,7 +16,7 @@ Berkeley Goggles
 \begin{minipage}{0.4\textwidth} 
 \centering 
 \large 
-Project Written Questions \\ 
+Project Question Design\\ 
 \normalsize 
 CS182\\ 
 \end{minipage}
@@ -48,7 +48,7 @@ Auto-encoders downsample the input images by a factor of \(f=2^m, m  \, \epsilon
         \label{fig:is}
     \end{figure}
 
-     \textcolor{blue}{Solution: For FID, the lower the score, i.e. the more similar the distributions between the generated images and real images, the lower the FID. For the inception score, the higher the score, the better the quality of the model. The top three performing models are LDM-4, LDM-8, LDM-16. The worst of the three models are LDM-1, LDM-2, and LDM-32. With LDM-1 and LDM-2, the performance is too slow and we see the same issues that occur with the large training time and computation requirements of regular diffusion models. LDM-32 results in information loss due to too much compression. With a downsampling factor of \(f = [4, 16]\) we can reap the benefits of faster performance without having losing too much information about the image in the process.}
+     \textcolor{blue}{Solution: For FID, the lower the FID score, the greater the similarity between the distributions of the generated images and real images. For the inception score, the higher the score, the better the quality of the model. The top three performing models are LDM-4, LDM-8, LDM-16. The worst of the three models are LDM-1, LDM-2, and LDM-32. With LDM-1 and LDM-2, the performance is too slow and we see the same issues that occur with the large training time and computation requirements of regular diffusion models. LDM-32 results in information loss due to too much compression. With a downsampling factor of \(f = [4, 16]\) we can reap the benefits of faster performance without having losing too much information about the image in the process.}
      
      
 \end{itemize}
@@ -68,7 +68,6 @@ For a conditional LDM, we use a conditional denoising auto-encoder which takes i
  The output of the conditional denoising auto-encoder can be written as
  \(\varepsilon_{\theta}(z_t, t, \tau_{\theta}(y))\). Thus the loss can be written as
  \[L_{LDM} = \mathbb{E}_{\varepsilon(x), y, \varepsilon \sim \mathcal{N}(0, 1), t} [\| \varepsilon - \varepsilon_{\theta}(z_t, t, \tau_{\theta}(y)) \|_2^2] \] }
-
 
 %-------------------------------
 %	Problem
@@ -118,6 +117,45 @@ You will implement a text conditioned denoising unet and the sampling algorithm.
     \end{figure}
 
     \textcolor{blue}{Solution: The performance of the model was not so great and did not meet expectations. As can be seen from the visualization picture, it only learns the style of the dataset, but does not learn the real semantic information. The main reason is that the datasets and models we use are too small. At the same time, MNIST is not a standard image-text pair dataset, so our text definition is not very accurate. In addition, clip does not perform particularly well with handwritten digits. In order to improve the performance of the model, we also need to consider using a larger and more professional image-text pair dataset while increasing the scale of the model. This further underscores the current trend towards larger models.}
+\end{itemize}
+
+%-------------------------------
+%	Problem
+%-------------------------------
+\section{Understanding the VAE Loss}
+
+Latent diffusion models use an autoencoder model similar to a VAE to encode images from pixel space to some compressed latent space, perform the diffusion process in this latent space, and finally decode the denoised latent back into pixel space. \\
+
+To have our model learn the correct latent space, we would like the estimated posterior by the encoder \(q_{\phi}(z|x_{i})\) to be very close to the real posterior \(p_{\theta}(z|x_i)\). We can quantify this using the Kullback-Leibler (KL) divergence to get a measure of the difference between the two distributions, defined as 
+\begin{center}
+\(D_{KL}(P||Q) = \mathbb{E}_{x\sim P(x)}[log \frac{P(x)}{Q(x)}]\)
+\end{center}
+
+However, \(p_{\theta}(z|x_i)\) is intractable in practice. Another goal of VAE-like models is to maximize the probability of generating real samples, or \(p_{\theta}(x)\). During training, rather than directly maximizing this quantity, we maximize a lower-bound called the evidence lower bound (ELBO):
+\begin{center}
+\(log(p_{\theta}(x_i)) \ge \mathcal{L}(x_{i}, \theta, \phi) = \mathbb{E}_{z\sim q_{\phi}(z|x_{i})}[log(p_{\theta}(x_i | z)] - D_{KL}[q_{\phi}(z|x_{i}) || p_{\theta}(z)]\)
+\end{center}
+At a high-level, this loss can be seen as doing two things:
+\begin{itemize}
+    \item \textbf {Reconstruction loss}: The first term corresponds to the likelihood of generating images from the true data distribution given a sampled latent
+    \item \textbf {Matching Prior}: The second term acts as a regularizer to minimize the difference between the estimated posterior and the prior (generally a standard normal).
+\end{itemize}
+Note: In the latent diffusion paper, the autoencoder loss is actually comprised of 3 terms: a patch-based discriminator loss for reconstruction, the standard KL-divergence term between \(q_{\phi}(z|x)\) and a prior \(p(z)\), and a regularizing term \(L_{reg}\) for the latent z to be zero centered and with small variance. For simplicity, however, we will just be analyzing the traditional ELBO loss here.
+\begin{itemize}
+    \item [(a)] \textbf {Show} that maximizing the ELBO loss also minimizes \(D_{KL}(q_{\phi}(z|x_{i})||p_{\theta}(z|x_i))\), the KL-divergence of the estimated posterior and the real posterior. \\\\
+    \emph {Hint: Start with the KL-divergence formula and manipulate it to get ELBO loss plus some other term.}
+    \textcolor{blue}{Solution:\\
+    \begin{align}
+    D_{KL}(q_{\phi}(z|x_{i})||p_{\theta}(z|x_i)) 
+    &= \mathbb{E}_{z\sim q_{\phi}(z|x_{i})} [log \frac{q_{\phi}(z|x_{i})}{p_{\theta}(z|x_i)}] \\
+    &= \mathbb{E}_{z\sim q_{\phi}(z|x_{i})} [log \frac{q_{\phi}(z|x_{i})p_{\theta}(x_i)}{p_{\theta}(z, x_i)}] \\
+    &= \mathbb{E}_{z\sim q_{\phi}(z|x_{i})} [log \frac{q_{\phi}(z|x_{i})p_{\theta}(x_i)}{p_{\theta}(x_i|z)p_{\theta}(z)}] \\
+    &= -\mathbb{E}_{z\sim q_{\phi}(z|x_{i})} [log \: p_{\theta}(x_i|z)] + \mathbb{E}_{z\sim q_{\phi}(z|x_{i})} [log \frac{q_{\phi}(z|x_{i})}{p_{\theta}(z)}] + \mathbb{E}_{z\sim q_{\phi}(z|x_{i})} [log \: p_{\theta}(x_i)] \\
+    &= -\mathbb{E}_{z\sim q_{\phi}(z|x_{i})} [log \: p_{\theta}(x_i|z)] + D_{KL}[q_{\phi}(z|x_{i}) || p_{\theta}(z)] + log \: p_{\theta}(x_i) \\
+    &= -\mathcal{L}(x_{i}, \theta, \phi) + log \: p_{\theta}(x_i) \\
+    \end{align}
+    This gives \(log \: p_{\theta}(x_i) = \mathcal{L}(x_{i}, \theta, \phi) + D_{KL}(q_{\phi}(z|x_{i})||p_{\theta}(z|x_i)) \). Since \(log \: p_{\theta}(x_i)\) is independent of \(q_{\phi}\), and thus fixed, maximizing the ELBO loss minimizes the KL term. This tells us that maximizing the ELBO loss does exactly what we want: maximize the likelihood of generating real data and minimize the difference between the estimated and real posterior distributions of the latent space. 
+    }
 \end{itemize}
 
 \end{document}
