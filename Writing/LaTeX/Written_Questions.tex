@@ -30,7 +30,7 @@ CS182\\
 %	Problem
 %-------------------------------
 \section{Paper Introduction}
-This homework explores Latent Diffusion Models as presented in the paper \href{https://arxiv.org/pdf/2112.10752.pdf}{High Resolution Image Synthesis with Latent Diffusion}. Stable diffusion is a text conditional latent diffusion model, created by researchers and engineers from CompVis, Stability AI, and LAION. Diffusion models are incredibly expensive to the train so with the use of latent space, we can greatly reduce the computational resource requirements for training, and also result very competitive performance on tasks such as inpainting, text-to-image synthesis, super-resolution and more. We encourage you to read over the paper on your own as it is quite fascinating!
+This homework explores Latent Diffusion Models as presented in the paper \href{https://arxiv.org/pdf/2112.10752.pdf}{High Resolution Image Synthesis with Latent Diffusion}. Diffusion models learn how to de-noise images that have had noise added to them during the diffusion process, which will be explored in this homework. Stable diffusion is a text conditional latent diffusion model, created by researchers and engineers from CompVis, Stability AI, and LAION. Diffusion models are incredibly expensive to the train so with the use of latent space, we can greatly reduce the computational resource requirements for training, and can also result in very competitive performance on tasks such as inpainting, text-to-image synthesis, super-resolution and more. We encourage you to read over the paper on your own as it is quite fascinating!
 
 \subsection{Auto-encoders and Downsampling}
 Latent diffusion models use pre-trained auto-encoders to produce a lower dimensional space representation of the input.
@@ -44,7 +44,7 @@ Auto-encoders downsample the input images by a factor of \(f=2^m, m  \, \epsilon
         \centering
         \includegraphics[width=0.4\textwidth]{fid_scores.png} \hfill
         \includegraphics[width=0.4\textwidth]{is_scores.png}
-        \caption{IS Scores vs Training Progress}
+        \caption{FID and IS Scores vs Training Progress}
         \label{fig:is}
     \end{figure}
 
