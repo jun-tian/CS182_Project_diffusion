@@ -142,9 +142,9 @@ At a high-level, this loss can be seen as doing two things:
 \end{itemize}
 Note: In the latent diffusion paper, the autoencoder loss is actually comprised of 3 terms: a patch-based discriminator loss for reconstruction, the standard KL-divergence term between \(q_{\phi}(z|x)\) and a prior \(p(z)\), and a regularizing term \(L_{reg}\) for the latent z to be zero centered and with small variance. For simplicity, however, we will just be analyzing the traditional ELBO loss here.
 \begin{itemize}
-    \item [(a)] \textbf {Show} that maximizing the ELBO loss also minimizes \(D_{KL}(q_{\phi}(z|x_{i})||p_{\theta}(z|x_i))\), the KL-divergence of the estimated posterior and the real posterior. \\\\
-    \emph {Hint: Start with the KL-divergence formula and manipulate it to get ELBO loss plus some other term.}
-    \textcolor{blue}{Solution:\\
+    \item [(a)] \textbf {Show} that maximizing the ELBO loss also minimizes \(D_{KL}(q_{\phi}(z|x_{i})||p_{\theta}(z|x_i))\), the KL-divergence of the estimated posterior and the real posterior. \\
+    \emph {Hint: Start with the KL-divergence formula and manipulate it to get ELBO loss plus some other term.} \\
+    \textcolor{blue}{Solution:
     \begin{align}
     D_{KL}(q_{\phi}(z|x_{i})||p_{\theta}(z|x_i)) 
     &= \mathbb{E}_{z\sim q_{\phi}(z|x_{i})} [log \frac{q_{\phi}(z|x_{i})}{p_{\theta}(z|x_i)}] \\
